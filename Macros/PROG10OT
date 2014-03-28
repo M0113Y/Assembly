@@ -1,0 +1,205 @@
+1                    J E S 2  J O B  L O G  --  S Y S T E M  S 0 W 1  --  N O D E  Z O S K C T R         
+0 
+ 22.40.47 JOB04911 ---- TUESDAY,   30 APR 2013 ----
+ 22.40.47 JOB04911  IRR010I  USERID KC03ECA  IS ASSIGNED TO THIS JOB.
+ 22.40.47 JOB04911  ICH70001I KC03ECA  LAST ACCESS AT 22:39:53 ON TUESDAY, APRIL 30, 2013
+ 22.40.47 JOB04911  $HASP373 KC03ECAA STARTED - INIT 2    - CLASS A - SYS S0W1
+ 22.40.47 JOB04911  $HASP395 KC03ECAA ENDED
+0------ JES2 JOB STATISTICS ------
+-  30 APR 2013 JOB EXECUTION DATE
+-          134 CARDS READ
+-          205 SYSOUT PRINT RECORDS
+-            0 SYSOUT PUNCH RECORDS
+-           16 SYSOUT SPOOL KBYTES
+-         0.00 MINUTES EXECUTION TIME
+         1 //KC03ECAA JOB ,'JONATHON MOLLEY',MSGCLASS=H                            JOB04911
+         2 //STEP1 EXEC PGM=ASSIST,PARM='MACRO=F'                                          
+         3 //STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                                
+         4 //SYSPRINT DD SYSOUT=*                                                          
+         5 //SYSIN DD *                                                                    
+ ICH70001I KC03ECA  LAST ACCESS AT 22:39:53 ON TUESDAY, APRIL 30, 2013
+ IEF236I ALLOC. FOR KC03ECAA STEP1
+ IGD103I SMS ALLOCATED TO DDNAME STEPLIB
+ IEF237I JES2 ALLOCATED TO SYSPRINT
+ IEF237I JES2 ALLOCATED TO SYSIN
+ IEF142I KC03ECAA STEP1 - STEP WAS EXECUTED - COND CODE 0000
+ IGD104I KC02293.ASSIST.LOADLIB                       RETAINED,  DDNAME=STEPLIB 
+ IEF285I   KC03ECA.KC03ECAA.JOB04911.D0000102.?         SYSOUT        
+ IEF285I   KC03ECA.KC03ECAA.JOB04911.D0000101.?         SYSIN         
+ IEF373I STEP/STEP1   /START 2013120.2240
+ IEF032I STEP/STEP1   /STOP  2013120.2240 
+         CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+         VIRT:   584K  SYS:   264K  EXT:        0K  SYS:    12016K
+ IEF375I  JOB/KC03ECAA/START 2013120.2240
+ IEF033I  JOB/KC03ECAA/STOP  2013120.2240 
+         CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+1*** ASSIST 4.0/A2-05/15/82  470/V7A/0:OS/VS2  INS=SDFP7/X=BGHO, CHECK/TRC/=1180, OPTS=CDKMPR FROM PENN ST*NIU COMPSCI*LT         
+0MACRO=F                                                                                                                          
+0                                                                                                               PAGE    1         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                       1          MACRO                    START MACRO                                            
+                                       2          BRTAB &REG,&LIST         PROTOTYPE                                              
+                                       3 .*********************************************************************                   
+                                       4 .* NAME:                 BRTAB                                                           
+                                       5 .*                                                                                       
+                                       6 .* FUNCTION:             TO GENERATE A GENERIC BRANCH TABLE                              
+                                       7 .*                                                                                       
+                                       8 .* PROTOTYPE:            BRTAB &REG,&LIST                                                
+                                       9 .*                                                                                       
+                                      10 .* SYMBOLIC PARAMETERS:  &REG,&LIST                                                      
+                                      11 .*                                                                                       
+                                      12 .* ERROR CONDITIONS:     EXIT MACRO IF THERE ISNT A RETURN CODE OR                       
+                                      13 .*                       NO PARAMETERS                                                   
+                                      14 .*                                                                                       
+                                      15 .* NOTES:                NONE                                                            
+                                      16 .*********************************************************************                   
+                                      17          LCLC  &NDX                       DECLARE LOCAL VARIABLES                        
+                                      18          LCLA  &NUM,&CNT                                                                 
+                                      19 &NDX     SETC  '&SYSNDX'                  SET A UNIQUE ID                                
+                                      20 &CNT     SETA  2                          SET COUNT TO 2                                 
+                                      21 &NUM     SETA  N'&LIST                    GET THE NUMBER OF PARAMETERS                   
+                                      22          AIF   ('&REG' NE '').FOUND       IF NO RETURN CODE IS FOUND                     
+                                      23          MNOTE 'MISSING RETURN CODE...'   PRINT ERROR MESSAGE AND                        
+                                      24          MEXIT                            EXIT MACRO                                     
+                                      25          AIF   ('&LIST' NE '').FOUND      IF NO PARAMETERS ARE FOUND                     
+                                      26          MNOTE 'MISSING PARAMETERS...'    PRINT ERROR MESSAGE AND                        
+                                      27          L     8,=F'8'                    LOAD 8 INTO THE                                
+                                      28          ST    8,&REG                     RETURN CODE                                    
+                                      29          MEXIT                            EXIT MACRO                                     
+                                      30 .FOUND   ANOP                             OTHERWISE BRANCH TO FOUND                      
+                                      31          B     LIST&NDX.(&REG)            SET RETURN CODE TO INDEX                       
+                                      32 LIST&NDX B     &LIST(1)                   FIRST SPOT TO BRANCH                           
+                                      33 .BLOOP   AIF   (&CNT  GT  &NUM).ENDLOP    LOOP UNTIL LAST PARAMETER                      
+                                      34          B     &LIST(&CNT)                                                               
+                                      35 &CNT     SETA  &CNT+1                     INCREMENT COUNT                                
+                                      36          AGO   .BLOOP                     BRANCH TO BLOOP                                
+                                      37 .ENDLOP  ANOP                             END LOOP                                       
+                                      38          MEND                             EXIT MACRO                                     
+                                      39 *                                                                                        
+                                      40 *                                                                                        
+1       Assembler Program to Test CSCI 360 Program 10, Spring 2013                                              PAGE    2         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                      42 ***********************************************************************                  
+                                      43 *                                                                                        
+                                      44 * Function:  This program is 'test data' for CSCI 360 Program 10                         
+                                      45 *    for Spring 2019.  See the assignment write-up for requirements                      
+                                      46 *    of the BRTAB macro instruction.                                                     
+                                      47 *                                                                                        
+                                      48 *********0*****6*******************6***********************************                  
+                                      49 *                                                                                        
+ 000000                               51 TSTPGM10 CSECT                                                                           
+ 000000 90EC D00C            0000C    52          STM   14,12,12(13)        Save the calling routine's register                   
+ 000004 18CF                          53          LR    12,15               Setup the base register                               
+ 000000                               54          USING TSTPGM10,12            for the routine                                    
+ 000006 41E0 C0E8            000E8    55          LA    14,MAINSAVE         Find the routine's savearea                           
+ 00000A 50D0 E004            00004    56          ST    13,4(,14)           Save the backward                                     
+ 00000E 50E0 D008            00008    57          ST    14,8(,13)             and forward pointers                                
+ 000012 18DE                          58          LR    13,14               R13 -> MAINSAVE                                       
+                                      59 *                                                                                        
+                                      61 *                                                                                        
+ 000014 1BFF                          62 FIRST    SR    15,15               Set return code to 0                                  
+ 000016 189F                          63          LR    9,15                Copy for message                                      
+ 000018 41A0 C030            00030    64          LA    10,SECOND           Where to go next                                      
+                                      65          BRTAB 15,(TEST,BLOWUP,BLOWUP) Handle return code                                
+ 00001C 47FF C020            00020    66+         B     LIST0001(15)               SET RETURN CODE TO INDEX                       
+ 000020 47F0 C0C2            000C2    67+LIST0001 B     TEST                       FIRST SPOT TO BRANCH                           
+ 000024 47F0 C0CE            000CE    68+         B     BLOWUP                                                                    
+ 000028 47F0 C0CE            000CE    69+         B     BLOWUP                                                                    
+ 00002C 47F0 C0CE            000CE    70          B     BLOWUP              Should not fall through to this line                  
+                                      71 *                                                                                        
+ 000030 9240 C130      00130          72 SECOND   MVI   CODEMSG,C' '        Change the carriage control                           
+ 000034 9240 C162      00162          73          MVI   ERRMSG,C' '           on both lines                                       
+ 000038 4130 0008            00008    74          LA    3,8                 Set return code to 8                                  
+ 00003C 1893                          75          LR    9,3                 Copy for message                                      
+ 00003E 41A0 C05A            0005A    76          LA    10,THIRD            Where to go next                                      
+                                      77          BRTAB 3,(*,*,TEST,BLOWUP) Handle return code                                    
+ 000042 47F3 C046            00046    78+         B     LIST0002(3)                SET RETURN CODE TO INDEX                       
+ 000046 47F0 C046            00046    79+LIST0002 B     *                          FIRST SPOT TO BRANCH                           
+ 00004A 47F0 C04A            0004A    80+         B     *                                                                         
+ 00004E 47F0 C0C2            000C2    81+         B     TEST                                                                      
+ 000052 47F0 C0CE            000CE    82+         B     BLOWUP                                                                    
+ 000056 47F0 C0CE            000CE    83          B     BLOWUP              Should not fall through to this line                  
+                                      84 *                                                                                        
+ 00005A 41F0 000C            0000C    85 THIRD    LA    15,12               Set return code to 12                                 
+ 00005E 189F                          86          LR    9,15                Copy for message                                      
+ 000060 41A0 C07C            0007C    87          LA    10,FOURTH           Where to go next                                      
+                                      88          BRTAB 15,(BLOWUP,BLOWUP,BLOWUP,TEST) Handle return code                         
+ 000064 47FF C068            00068    89+         B     LIST0003(15)               SET RETURN CODE TO INDEX                       
+ 000068 47F0 C0CE            000CE    90+LIST0003 B     BLOWUP                     FIRST SPOT TO BRANCH                           
+ 00006C 47F0 C0CE            000CE    91+         B     BLOWUP                                                                    
+ 000070 47F0 C0CE            000CE    92+         B     BLOWUP                                                                    
+ 000074 47F0 C0C2            000C2    93+         B     TEST                                                                      
+ 000078 47F0 C0CE            000CE    94          B     BLOWUP              Should not fall through to this line                  
+                                      95 *                                                                                        
+ 00007C 41F0 0010            00010    96 FOURTH   LA    15,16               Set return code to 16                                 
+ 000080 189F                          97          LR    9,15                Copy for message                                      
+ 000082 41A0 C08A            0008A    98          LA    10,FIFTH            Where to go next                                      
+                                      99          BRTAB                                                                           
+ ----->AS***MNOTE***    1,MISSING RETURN CODE...                                                                  <-ERROR         
+1       Assembler Program to Test CSCI 360 Program 10, Spring 2013                                              PAGE    3         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+ 000086 47F0 C0CE            000CE   101          B     BLOWUP              Should fall through to this line                      
+                                     102 *                                                                                        
+ 00008A 4170 0010            00010   103 FIFTH    LA    7,16                Set return code to 16                                 
+ 00008E 1897                         104          LR    9,7                 Copy for message                                      
+ 000090 41A0 C0B4            000B4   105          LA    10,SIXTH            Where to go next                                      
+                                     106          BRTAB 7,(BLOWUP,BLOWUP,BLOWUP,BLOWUP,TEST,BLOWUP)                               
+ 000094 47F7 C098            00098   107+         B     LIST0005(7)                SET RETURN CODE TO INDEX                       
+ 000098 47F0 C0CE            000CE   108+LIST0005 B     BLOWUP                     FIRST SPOT TO BRANCH                           
+ 00009C 47F0 C0CE            000CE   109+         B     BLOWUP                                                                    
+ 0000A0 47F0 C0CE            000CE   110+         B     BLOWUP                                                                    
+ 0000A4 47F0 C0CE            000CE   111+         B     BLOWUP                                                                    
+ 0000A8 47F0 C0C2            000C2   112+         B     TEST                                                                      
+ 0000AC 47F0 C0CE            000CE   113+         B     BLOWUP                                                                    
+ 0000B0 47F0 C0CE            000CE   114          B     BLOWUP              Should not fall through to this line                  
+                                     115 *                                                                                        
+ 0000B4 4180 0004            00004   116 SIXTH    LA    8,4                 Set return code to 4                                  
+ 0000B8 1898                         117          LR    9,8                 Copy for message                                      
+ 0000BA 41A0 C0DA            000DA   118          LA    10,RETURN           Where to go next                                      
+                                     119          BRTAB ,(BLOWUP,TEST,BLOWUP) Handle return code                                  
+ ----->AS***MNOTE***    1,MISSING RETURN CODE...                                                                  <-ERROR         
+ 0000BE 47F0 C0CE            000CE   121          B     BLOWUP              Should not fall through to this line                  
+                                     122 *                                                                                        
+ 0000C2 5290 C152            00152   123 TEST     XDECO 9,CODEPRT           Get printable return code                             
+ 0000C6 E020 C130 0032 00130         124          XPRNT CODEMSG,CODEMSGL    Print "normal" message                                
+ 0000CC 07FA                         125          BR    10                  Do next test                                          
+                                     126 *                                                                                        
+ 0000CE 5290 C184            00184   127 BLOWUP   XDECO 9,ERRPRT            Get printable return code                             
+ 0000D2 E020 C162 0032 00162         128          XPRNT ERRMSG,ERRMSGL      Print error message                                   
+ 0000D8 07FA                         129          BR    10                  Do next test                                          
+                                     130 *                                                                                        
+                                     131 *                                                                                        
+ 0000DA 58D0 D004            00004   132 RETURN   L     13,4(,13)          Get the address of the savearea                        
+ 0000DE 98EC D00C            0000C   133          LM    14,12,12(13)       Restore the calling routine's regs                     
+ 0000E2 07FE                         134          BR    14                 I'm done!                                              
+                                     135          LTORG                                                                           
+                                     136 *                                                                                        
+                                     137 *** Storage for TSTPGM10 ***                                                             
+                                     138 *                                                                                        
+ 0000E8                              139 MAINSAVE DS    18F                Storage for registers                                  
+                                     140 *                                                                                        
+ 000130 F1                           141 CODEMSG  DC    C'1'                                                                      
+ 000131 5C5C5C40C3969999             142          DC    C'*** Correctly handled return code'                                      
+ 000152                              143 CODEPRT  DS    CL12                                                                      
+ 00015E 405C5C5C                     144          DC    C' ***'                                                                   
+ 000032                              145 CODEMSGL EQU   *-CODEMSG           Length of message                                     
+                                     146 *                                                                                        
+ 000162 F1                           147 ERRMSG   DC    C'1'                                                                      
+ 000163 5C5C5C40C5999996             148          DC    C'*** Error handling return code   '                                      
+ 000184                              149 ERRPRT   DS    CL12                                                                      
+ 000190 405C5C5C                     150          DC    C' ***'                                                                   
+ 000032                              151 ERRMSGL  EQU   *-ERRMSG                                                                  
+                                     152          END   TSTPGM10                                                                  
+0***  NO   STATEMENTS FLAGGED -  NO   WARNINGS,  NO   ERRORS                                                                      
+0*** DYNAMIC CORE AREA USED:  LOW:    8120 HIGH:     744 LEAVING:  484704 FREE BYTES. AVERAGE:       57 BYTES/STMT ***            
+0*** ASSEMBLY TIME =    0.000 SECS,   153000 STATEMENTS/SEC ***                                                                   
+0*** PROGRAM EXECUTION BEGINNING - ANY OUTPUT BEFORE EXECUTION TIME MESSAGE IS PRODUCED BY USER PROGRAM ***                       
+1*** Correctly handled return code           0 ***                                                                                
+ *** Correctly handled return code           8 ***                                                                                
+ *** Correctly handled return code          12 ***                                                                                
+ *** Error handling return code             16 ***                                                                                
+ *** Correctly handled return code          16 ***                                                                                
+ *** Error handling return code              4 ***                                                                                
+0*** EXECUTION TIME =    0.000 SECS.        57 INSTRUCTIONS EXECUTED -    57000 INSTRUCTIONS/SEC ***                              
+0*** FIRST CARD NOT READ: NO CARDS READ:FILE UNOPENED                                                                             
+0*** AM004 - NORMAL USER TERMINATION BY RETURN ***                                                                                

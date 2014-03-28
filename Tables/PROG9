@@ -1,0 +1,286 @@
+//KC03ECAA JOB ,'JONATHON MOLLEY',MSGCLASS=H
+//STEP1 EXEC PGM=ASSIST
+//STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR
+//SYSPRINT DD SYSOUT=*
+//SYSIN DD *
+         TITLE 'CSCI 360 - Spring 2013 - Program 9'
+***********************************************************************
+* NAME:      MAIN
+*
+* FUNCTION:  THIS PROGRAM BUILDS A TABLE OF THE 2013 BIG 9 CONFERENCE
+*            TIDDLY-WINKS TOURNAMENT AND PRINTS IT OUT.
+*
+* INPUT:     THE INPUT TO THE PROGRAM IS A FILE THAT CONTAINS THE TEAM
+*            INFORMATION TO BUILD THE TABLE. EACH RECORD CONTAINS A
+*            SCHOOL NAME, TEAM NAME, GAME 1,2, AND 3 STATS.
+*
+* OUTPUT:    THE OUTPUT FORM THE PROGRAM IS ONE REPORT. THE REPORT IS
+*            THE LISTING OF THE SCHOOL, TEAM, AND STATS FOR EACH GAME.
+*
+* ENTRY CONDS:  NONE
+*
+* EXIT CONDS:   NONE
+*
+* REGISTER USAGE: 1  -- ADDRESS OF THE PARAMETER LIST
+*                 14 -- RETURN CONTROL
+*                 15 -- SUBROUTINE ADDRESSES
+*
+* PSEUDOCODE:  1. BUILD THE TABLE
+*              2. PRINT THE TBALE
+*
+* NOTES:   NONE
+***********************************************************************
+         EJECT
+MAIN     CSECT
+         STM   R14,R12,12(R13)      SAVE THE CALLING ROUTINES REGISTERS
+         LR    R12,R15              SETUP THE BASE REGISTER
+         USING MAIN,R12             FOR THE ROUTINE
+         LA    R14,MAINSAVE         FIND THE ROUTINE'S SAVEAREA
+         ST    R13,4(,R14)          SAVE THE BACKWARE
+         ST    R14,8(,R13)          AND FORWARD POINTERS
+         LR    R13,R14
+*
+* CALL BUILD ROUTINE TO BUILD THE TABLE
+*
+         LA    R1,BPARM
+         L     R15,=V(BUILD)
+         BALR  R14,R15
+*
+* CALL PRINT ROUTINE TO PRINT OUT THE TABLE
+*
+         LA    R1,PPARM
+         L     R15,=V(PRINT)
+         BALR  R14,R15
+*
+         L     R13,4(,R13)            EXIT LINKAGE
+         LM    R14,R12,12(R13)
+         BR    R14
+         LTORG
+*
+* MAIN STORAGE
+*
+MAINSAVE DS    18F
+BUF      DS    CL80
+TABLE    DC    576F'-1'
+EOT      DC    A(TABLE)
+BPARM    DC    A(EOT,BUF)
+PPARM    DC    A(TABLE,EOT)
+***********************************************************************
+*
+*  NAME:          BUILD
+*
+*  FUNCTION:      THIS ROUTINES BUILDS THE TABLE AND CHECKS FOR COLONS
+*
+*  ENTRY COND:    0(1) - ADDRESS OF LOGICAL END OF THE TABLE
+*                 4(1) - ADDRESS OF THE INPUT BUFFER
+*
+*  INPUT:         INPUT BUFFER
+*
+*  LOGIC:         1. READ FIRST RECORD
+*                 2. WHILE THERE ARE MORE RECORDS
+*                 3.  GET INFO FROM THE INPUT RECORD
+*                 4.  CHECK FOR COLONS
+*                 5.  PUT INTO THE TABLE
+*                 6.  INCREMENT TABLE POINTER
+*                 7.  READ NEXT RECORD
+*                 8. END WHILE
+*                 9. SAVE THE LOGICAL END OF TABLE ADDRESS
+*
+*  REGISTERS:     R3    - ADDRESS OF LOGICAL END OF THE TABLE
+*                 R4    - ADDRESS OF THE INPUT BUFFER
+*                 R5    - TABLE POINTER
+*                 R1    - ADDRESS OF THE PARAMETER LIST
+*                 R8,R9 - LENGTH OF SCHOOL NAME AND TEAM NAME
+*                 R6,R7 - WORK REGISTERS TO MOVE DATA
+*
+***********************************************************************
+         EJECT
+BUILD    CSECT
+         STM   R14,R12,12(R13)      SAVE THE CALLING ROUTINE'S REGISTER
+         LR    R12,R15              SETUP THE BASE REGISTER
+         USING BUILD,R12            FOR THE ROUTINE
+         LA    R14,BSAVE            FIND THE ROUTINE'S SAVEAREA
+         ST    R13,4(,R14)          SAVE THE BACKWARD
+         ST    R14,8(,R13)          AND FORWARD POINTERS
+         LR    R13,R14
+*
+         LM    R3,R4,0(R1)          UNLOAD PARAMETERS
+*                                   R3 - EOT   R4 - BUFFER
+         L     R5,0(,R3)            START AT NEXT AVAILBLE ENTRY
+         XREAD 0(R4),80             READ FIRST RECORD
+LOOP     BL    ENDLOOP              WHILE NOT END OF FILE LOOP
+*
+         LA    R7,0(,R4)            GET SCHOOL NAME
+         TRT   0(80,R4),COLON       CHECK FOR COLON
+         LA    R6,1(,R1)            PUT ADDRESS OF TEAM IN R6
+         SR    R1,R7                SCHOOL - COLON TO CAL THE LENGTH
+         LR    R8,R1                SAVE THE LENGTH
+         BCTR  R1,R0                DECREMENT LENGTH BY 1 FOR MVC
+         EX    R1,MOVE              MOVE SCHOOL INTO TABLE
+*
+         TRT   0(80,R6),COLON       CHECK FOR COLON
+         LA    R7,1(,R1)            PUT ADDRESS OF GAME 1 INTO R7
+         SR    R1,R6                TEAM - COLON TO CAL THE LENGTH
+         LR    R9,R1                SAVE THE LENGTH
+         BCTR  R1,R0                DECREMENT LENGTH BY 1 FOR MVC
+         EX    R1,MOVE2             MOVE TEAM INTO TABLE
+*
+         TRT   0(80,R7),COLON       CHECK FOR COLON
+         LA    R6,1(,R1)            PUT ADDRESS OF GAME 2 INTO R6
+         PACK  42(3,R5),0(3,R7)     PACK GAME 1 INTO TABLE
+*
+         TRT   0(80,R6),COLON       CHECK FOR COLON
+         LA    R7,1(,R1)            PUT ADDRESS OF GAME 3 INTO R7
+         PACK  45(3,R5),0(3,R6)     PACK GAME 3 INTO TABLE
+*
+         TRT   0(80,R7),COLON       CHECK FOR COLON
+         PACK  48(3,R5),0(3,R7)
+*
+         BCTR  R8,R0                DECREMENT REGISTER R8 BY 1
+         SLL   R8,12                00 00 10 00 SCHOOL LENGTH
+         BCTR  R9,R0                DECREMENT REGISTER R9 BY 1
+         AR    R8,R9                00 00 10 01 SCHOOL + TEAM LENGTH
+         PACK  52(0,R5),0(R8)       PUT THE LENGTH INTO THE TABLE
+*
+         LA    R5,54(,R5)           INCREMENT TO NEXT ENTRY
+         XREAD 0(R4),80             READ NEXT RECORD
+         B     LOOP                 CONTINUE TO BRANCH
+ENDLOOP  DS    0H                   END LOOP
+         ST    R5,0(,R3)            RETURN ANSWER TO CALLER
+*
+         L     R13,4(,R13)          EXIT LINKAGE
+         LM    R14,R12,12(R13)
+         BR    R14
+         LTORG
+*
+* BUILD STORAGE AREA
+*
+BSAVE    DS    18F
+COLON    DC    256X'00'
+         ORG   COLON+C':'
+         DC    X'FF'
+         ORG
+MOVE     MVC   0(0,R5),0(R7)
+MOVE2    MVC   21(0,R5),0(R6)
+TEMP1    DS    D
+***********************************************************************
+*
+*  NAME:          PRINT
+*
+*  FUNCTION:      THIS ROUTINES PRINT THE TABLE
+*
+*  ENTRY COND:    0(1) - ADDRESS OF THE TABLE
+*                 4(1) - ADDRESS OF LOGICAL END OF THE TABLE
+*
+*
+*  LOGIC:         1. READ FIRST RECORD
+*                 2. WHILE THERE ARE MORE RECORDS
+*                 3.  GET INFO FROM THE TABLE
+*                 4.  PUT ONTO PRINT LINE
+*                 5.  WRITE PRINT LINE
+*                 6.  INCREMENT TABLE POINTER
+*                 7.  READ NEXT RECORD
+*                 8. END WHILE
+*
+*  REGISTERS:     R3    - ADDRESS OF THE TABLE
+*                 R4    - ADDRESS OF THE END OF THE TABLE
+*                 R5    - TABLE POINTER
+*                 R1    - ADDRESS OF THE PARAMETER LIST
+*
+***********************************************************************
+PRINT    CSECT
+         STM   R14,R12,12(R13)      SAVE THE CALLING ROUTINE'S REGISTER
+         LR    R12,R15              SETUP THE BASE REGISTER
+         USING PRINT,R12            FOR THE ROUTINE
+         LA    R14,PSAVE            FIND THE ROUTINE'S SAVEAREA
+         ST    R13,4(,R14)          SAVE THE BACKWARD
+         ST    R14,8(,R13)          AND FORWARD POINTERS
+         LR    R13,R14
+*
+* TABLE HEADERS
+*
+         XPRNT PHEAD1,ENDPH1-PHEAD1
+         XPRNT PHEAD2,ENDPH2-PHEAD2
+         XPRNT DASH,ENDDASH-DASH
+*
+         LM    R3,R4,0(R1)                 UNLOAD PARAMETERS
+*
+LOOP2    C     R3,0(,R4)                   WHILE NOT END OF TABLE LOOP
+         BNL   ENDLP2                      EXIT AT END OF TABLE
+*
+*        BCTR  R1,R0
+*        EX    MVC1
+         MVC   PLINE+1(20),0(R3)
+         MVC   PLINE+27(20),21(R3)         MOVE TEAM TO PRINT LINE
+*
+         MVC   GAME1(6),=X'402020202120'   MOVE GAME 1 TO LINE
+         ED    GAME1(6),42(R3)
+         MVC   PLINE+49(6),GAME1
+*
+         MVC   GAME2(6),=X'402020202120'   MOVE GAME 2 TO LINE
+         ED    GAME2(6),45(R3)
+         MVC   PLINE+59(6),GAME2
+*
+         MVC   GAME3(6),=X'402020202120'   MOVE GAME 3 TO LINE
+         ED    GAME3(6),48(R3)
+         MVC   PLINE+69(6),GAME3
+*
+         XPRNT PLINE,ENDPLINE-PLINE        PRINT TABLE
+*
+         LA    R3,54(,R3)                  INCREMENT TABLE POINTER
+         B     LOOP2                       CONTINUE LOOP
+ENDLP2   DS    0H                          END LOOP
+*
+         L     R13,4(,R13)                 EXIT LINKAGE
+         LM    R14,R12,12(R13)
+         BR    R14
+         LTORG
+*
+* PRINT STORAGE AREA
+*
+PSAVE    DS    18F                         PRINT SAVE AREA
+PHEAD1   DC    CL18'1'                     PAGE HEADER
+         DC    C'BIG 9 CONFERENCE TIDDILY-WINKS TOURNAMENT'
+ENDPH1   DS    0C
+PHEAD2   DC    C'-'                        PAGE HEADER
+         DC    CL26'SCHOOL'
+         DC    CL24'TEAM'
+         DC    CL10'GAME 1'
+         DC    CL10'GAME 2'
+         DC    CL10'GAME 3'
+ENDPH2   DS    0C
+DASH     DC    C' '                        DASH LINE
+         DC    76C'-'
+ENDDASH  DS    0C
+PLINE    DC    C' '                        TABLE PRINT LINE
+         DC    CL90' '
+ENDPLINE DS    0C
+GAME1    DS    PL6
+GAME2    DS    PL6
+GAME3    DS    PL6
+MVC1     MVC   PLINE+1,0(R3)
+MVC2     MVC   PLINE+27,21(R3)
+SCHOOL1  DS    CL20
+*
+* EQUATES
+*
+R0      EQU   0
+R1      EQU   1
+R2      EQU   2
+R3      EQU   3
+R4      EQU   4
+R5      EQU   5
+R6      EQU   6
+R7      EQU   7
+R8      EQU   8
+R9      EQU   9
+R10     EQU   10
+R11     EQU   11
+R12     EQU   12
+R13     EQU   13
+R14     EQU   14
+R15     EQU   15
+        END   MAIN
+/*
+//FT05F001 DD DSN=KC02330.CSCI360.FILES(DATA9),DISP=SHR
+//

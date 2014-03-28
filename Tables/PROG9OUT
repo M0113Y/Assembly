@@ -1,0 +1,381 @@
+1                    J E S 2  J O B  L O G  --  S Y S T E M  S 0 W 1  --  N O D E  Z O S K C T R         
+0 
+ 21.15.42 JOB03726 ---- WEDNESDAY, 24 APR 2013 ----
+ 21.15.42 JOB03726  IRR010I  USERID KC03ECA  IS ASSIGNED TO THIS JOB.
+ 21.15.42 JOB03726  ICH70001I KC03ECA  LAST ACCESS AT 21:13:05 ON WEDNESDAY, APRIL 24, 2013
+ 21.15.42 JOB03726  $HASP373 KC03ECAA STARTED - INIT 2    - CLASS A - SYS S0W1
+ 21.15.42 JOB03726  $HASP395 KC03ECAA ENDED
+0------ JES2 JOB STATISTICS ------
+-  24 APR 2013 JOB EXECUTION DATE
+-          285 CARDS READ
+-          381 SYSOUT PRINT RECORDS
+-            0 SYSOUT PUNCH RECORDS
+-           28 SYSOUT SPOOL KBYTES
+-         0.00 MINUTES EXECUTION TIME
+         1 //KC03ECAA JOB ,'JONATHON MOLLEY',MSGCLASS=H                            JOB03726
+         2 //STEP1 EXEC PGM=ASSIST                                                         
+         3 //STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                                
+         4 //SYSPRINT DD SYSOUT=*                                                          
+         5 //SYSIN DD *                                                                    
+         6 //FT05F001 DD DSN=KC02330.CSCI360.FILES(DATA9),DISP=SHR                         
+ ICH70001I KC03ECA  LAST ACCESS AT 21:13:05 ON WEDNESDAY, APRIL 24, 2013
+ IEF236I ALLOC. FOR KC03ECAA STEP1
+ IGD103I SMS ALLOCATED TO DDNAME STEPLIB
+ IEF237I JES2 ALLOCATED TO SYSPRINT
+ IEF237I JES2 ALLOCATED TO SYSIN
+ IGD103I SMS ALLOCATED TO DDNAME FT05F001
+ IEF142I KC03ECAA STEP1 - STEP WAS EXECUTED - COND CODE 0000
+ IGD104I KC02293.ASSIST.LOADLIB                       RETAINED,  DDNAME=STEPLIB 
+ IEF285I   KC03ECA.KC03ECAA.JOB03726.D0000102.?         SYSOUT        
+ IEF285I   KC03ECA.KC03ECAA.JOB03726.D0000101.?         SYSIN         
+ IGD104I KC02330.CSCI360.FILES                        RETAINED,  DDNAME=FT05F001
+ IEF373I STEP/STEP1   /START 2013114.2115
+ IEF032I STEP/STEP1   /STOP  2013114.2115 
+         CPU:     0 HR  00 MIN  00.01 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+         VIRT:   584K  SYS:   284K  EXT:        0K  SYS:    10424K
+ IEF375I  JOB/KC03ECAA/START 2013114.2115
+ IEF033I  JOB/KC03ECAA/STOP  2013114.2115 
+         CPU:     0 HR  00 MIN  00.01 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+1*** ASSIST 4.0/A2-05/15/82  470/V7A/0:OS/VS2  INS=SDFP7/X=BGHO, CHECK/TRC/=1180, OPTS=CDKMPR FROM PENN ST*NIU COMPSCI*LT         
+0                                                                                                                                 
+0       CSCI 360 - Spring 2013 - Program 9                                                                      PAGE    1         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                       2 ***********************************************************************                  
+                                       3 * NAME:      MAIN                                                                        
+                                       4 *                                                                                        
+                                       5 * FUNCTION:  THIS PROGRAM BUILDS A TABLE OF THE 2013 BIG 9 CONFERENCE                    
+                                       6 *            TIDDLY-WINKS TOURNAMENT AND PRINTS IT OUT.                                  
+                                       7 *                                                                                        
+                                       8 * INPUT:     THE INPUT TO THE PROGRAM IS A FILE THAT CONTAINS THE TEAM                   
+                                       9 *            INFORMATION TO BUILD THE TABLE. EACH RECORD CONTAINS A                      
+                                      10 *            SCHOOL NAME, TEAM NAME, GAME 1,2, AND 3 STATS.                              
+                                      11 *                                                                                        
+                                      12 * OUTPUT:    THE OUTPUT FORM THE PROGRAM IS ONE REPORT. THE REPORT IS                    
+                                      13 *            THE LISTING OF THE SCHOOL, TEAM, AND STATS FOR EACH GAME.                   
+                                      14 *                                                                                        
+                                      15 * ENTRY CONDS:  NONE                                                                     
+                                      16 *                                                                                        
+                                      17 * EXIT CONDS:   NONE                                                                     
+                                      18 *                                                                                        
+                                      19 * REGISTER USAGE: 1  -- ADDRESS OF THE PARAMETER LIST                                    
+                                      20 *                 14 -- RETURN CONTROL                                                   
+                                      21 *                 15 -- SUBROUTINE ADDRESSES                                             
+                                      22 *                                                                                        
+                                      23 * PSEUDOCODE:  1. BUILD THE TABLE                                                        
+                                      24 *              2. PRINT THE TBALE                                                        
+                                      25 *                                                                                        
+                                      26 * NOTES:   NONE                                                                          
+                                      27 ***********************************************************************                  
+1       CSCI 360 - Spring 2013 - Program 9                                                                      PAGE    2         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                                                                                                                  
+                                                                                                                                  
+ 000000                               29 MAIN     CSECT                                                                           
+ 000000 90EC D00C            0000C    30          STM   R14,R12,12(R13)      SAVE THE CALLING ROUTINES REGISTERS                  
+ 000004 18CF                          31          LR    R12,R15              SETUP THE BASE REGISTER                              
+ 000000                               32          USING MAIN,R12             FOR THE ROUTINE                                      
+ 000006 41E0 C040            00040    33          LA    R14,MAINSAVE         FIND THE ROUTINE'S SAVEAREA                          
+ 00000A 50D0 E004            00004    34          ST    R13,4(,R14)          SAVE THE BACKWARE                                    
+ 00000E 50E0 D008            00008    35          ST    R14,8(,R13)          AND FORWARD POINTERS                                 
+ 000012 18DE                          36          LR    R13,R14                                                                   
+                                      37 *                                                                                        
+                                      38 * CALL BUILD ROUTINE TO BUILD THE TABLE                                                  
+                                      39 *                                                                                        
+ 000014 4110 C9DC            009DC    40          LA    R1,BPARM                                                                  
+ 000018 58F0 C038            00038    41          L     R15,=V(BUILD)                                                             
+ 00001C 05EF                          42          BALR  R14,R15                                                                   
+                                      43 *                                                                                        
+                                      44 * CALL PRINT ROUTINE TO PRINT OUT THE TABLE                                              
+                                      45 *                                                                                        
+ 00001E 4110 C9E4            009E4    46          LA    R1,PPARM                                                                  
+ 000022 58F0 C03C            0003C    47          L     R15,=V(PRINT)                                                             
+ 000026 05EF                          48          BALR  R14,R15                                                                   
+                                      49 *                                                                                        
+ 000028 58D0 D004            00004    50          L     R13,4(,R13)            EXIT LINKAGE                                       
+ 00002C 98EC D00C            0000C    51          LM    R14,R12,12(R13)                                                           
+ 000030 07FE                          52          BR    R14                                                                       
+                                      53          LTORG                                                                           
+ 000038 000009F0                      54                =V(BUILD)                                                                 
+ 00003C 00000C00                      55                =V(PRINT)                                                                 
+                                      56 *                                                                                        
+                                      57 * MAIN STORAGE                                                                           
+                                      58 *                                                                                        
+ 000040                               59 MAINSAVE DS    18F                                                                       
+ 000088                               60 BUF      DS    CL80                                                                      
+ 0000D8 FFFFFFFFFFFFFFFF              61 TABLE    DC    576F'-1'                                                                  
+ 0009D8 000000D8                      62 EOT      DC    A(TABLE)                                                                  
+ 0009DC 000009D800000088              63 BPARM    DC    A(EOT,BUF)                                                                
+ 0009E4 000000D8000009D8              64 PPARM    DC    A(TABLE,EOT)                                                              
+                                      65 ***********************************************************************                  
+                                      66 *                                                                                        
+                                      67 *  NAME:          BUILD                                                                  
+                                      68 *                                                                                        
+                                      69 *  FUNCTION:      THIS ROUTINES BUILDS THE TABLE AND CHECKS FOR COLONS                   
+                                      70 *                                                                                        
+                                      71 *  ENTRY COND:    0(1) - ADDRESS OF LOGICAL END OF THE TABLE                             
+                                      72 *                 4(1) - ADDRESS OF THE INPUT BUFFER                                     
+                                      73 *                                                                                        
+                                      74 *  INPUT:         INPUT BUFFER                                                           
+                                      75 *                                                                                        
+                                      76 *  LOGIC:         1. READ FIRST RECORD                                                   
+                                      77 *                 2. WHILE THERE ARE MORE RECORDS                                        
+                                      78 *                 3.  GET INFO FROM THE INPUT RECORD                                     
+                                      79 *                 4.  CHECK FOR COLONS                                                   
+                                      80 *                 5.  PUT INTO THE TABLE                                                 
+                                      81 *                 6.  INCREMENT TABLE POINTER                                            
+                                      82 *                 7.  READ NEXT RECORD                                                   
+                                      83 *                 8. END WHILE                                                           
+1       CSCI 360 - Spring 2013 - Program 9                                                                      PAGE    3         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                      84 *                 9. SAVE THE LOGICAL END OF TABLE ADDRESS                               
+                                      85 *                                                                                        
+                                      86 *  REGISTERS:     R3    - ADDRESS OF LOGICAL END OF THE TABLE                            
+                                      87 *                 R4    - ADDRESS OF THE INPUT BUFFER                                    
+                                      88 *                 R5    - TABLE POINTER                                                  
+                                      89 *                 R1    - ADDRESS OF THE PARAMETER LIST                                  
+                                      90 *                 R8,R9 - LENGTH OF SCHOOL NAME AND TEAM NAME                            
+                                      91 *                 R6,R7 - WORK REGISTERS TO MOVE DATA                                    
+                                      92 *                                                                                        
+                                      93 ***********************************************************************                  
+1       CSCI 360 - Spring 2013 - Program 9                                                                      PAGE    4         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                                                                                                                  
+                                                                                                                                  
+ 0009F0                               95 BUILD    CSECT                                                                           
+ 0009F0 90EC D00C            0000C    96          STM   R14,R12,12(R13)      SAVE THE CALLING ROUTINE'S REGISTER                  
+ 0009F4 18CF                          97          LR    R12,R15              SETUP THE BASE REGISTER                              
+ 0009F0                               98          USING BUILD,R12            FOR THE ROUTINE                                      
+ 0009F6 41E0 C0B0            00AA0    99          LA    R14,BSAVE            FIND THE ROUTINE'S SAVEAREA                          
+ 0009FA 50D0 E004            00004   100          ST    R13,4(,R14)          SAVE THE BACKWARD                                    
+ 0009FE 50E0 D008            00008   101          ST    R14,8(,R13)          AND FORWARD POINTERS                                 
+ 000A02 18DE                         102          LR    R13,R14                                                                   
+                                     103 *                                                                                        
+ 000A04 9834 1000            00000   104          LM    R3,R4,0(R1)          UNLOAD PARAMETERS                                    
+                                     105 *                                   R3 - EOT   R4 - BUFFER                               
+ 000A08 5850 3000            00000   106          L     R5,0(,R3)            START AT NEXT AVAILBLE ENTRY                         
+ 000A0C E004 0000 0050 00000         107          XREAD 0(R4),80             READ FIRST RECORD                                    
+ 000A12 4740 C09C            00A8C   108 LOOP     BL    ENDLOOP              WHILE NOT END OF FILE LOOP                           
+                                     109 *                                                                                        
+ 000A16 4170 4000            00000   110          LA    R7,0(,R4)            GET SCHOOL NAME                                      
+ 000A1A DD4F 4000 C0F8 00000 00AE8   111          TRT   0(80,R4),COLON       CHECK FOR COLON                                      
+ 000A20 4160 1001            00001   112          LA    R6,1(,R1)            PUT ADDRESS OF TEAM IN R6                            
+ 000A24 1B17                         113          SR    R1,R7                SCHOOL - COLON TO CAL THE LENGTH                     
+ 000A26 1881                         114          LR    R8,R1                SAVE THE LENGTH                                      
+ 000A28 0610                         115          BCTR  R1,R0                DECREMENT LENGTH BY 1 FOR MVC                        
+ 000A2A 4410 C1F8            00BE8   116          EX    R1,MOVE              MOVE SCHOOL INTO TABLE                               
+                                     117 *                                                                                        
+ 000A2E DD4F 6000 C0F8 00000 00AE8   118          TRT   0(80,R6),COLON       CHECK FOR COLON                                      
+ 000A34 4170 1001            00001   119          LA    R7,1(,R1)            PUT ADDRESS OF GAME 1 INTO R7                        
+ 000A38 1B16                         120          SR    R1,R6                TEAM - COLON TO CAL THE LENGTH                       
+ 000A3A 1891                         121          LR    R9,R1                SAVE THE LENGTH                                      
+ 000A3C 0610                         122          BCTR  R1,R0                DECREMENT LENGTH BY 1 FOR MVC                        
+ 000A3E 4410 C1FE            00BEE   123          EX    R1,MOVE2             MOVE TEAM INTO TABLE                                 
+                                     124 *                                                                                        
+ 000A42 DD4F 7000 C0F8 00000 00AE8   125          TRT   0(80,R7),COLON       CHECK FOR COLON                                      
+ 000A48 4160 1001            00001   126          LA    R6,1(,R1)            PUT ADDRESS OF GAME 2 INTO R6                        
+ 000A4C F222 502A 7000 0002A 00000   127          PACK  42(3,R5),0(3,R7)     PACK GAME 1 INTO TABLE                               
+                                     128 *                                                                                        
+ 000A52 DD4F 6000 C0F8 00000 00AE8   129          TRT   0(80,R6),COLON       CHECK FOR COLON                                      
+ 000A58 4170 1001            00001   130          LA    R7,1(,R1)            PUT ADDRESS OF GAME 3 INTO R7                        
+ 000A5C F222 502D 6000 0002D 00000   131          PACK  45(3,R5),0(3,R6)     PACK GAME 3 INTO TABLE                               
+                                     132 *                                                                                        
+ 000A62 DD4F 7000 C0F8 00000 00AE8   133          TRT   0(80,R7),COLON       CHECK FOR COLON                                      
+ 000A68 F222 5030 7000 00030 00000   134          PACK  48(3,R5),0(3,R7)                                                          
+                                     135 *                                                                                        
+ 000A6E 0680                         136          BCTR  R8,R0                DECREMENT REGISTER R8 BY 1                           
+ 000A70 8980 000C            0000C   137          SLL   R8,12                00 00 10 00 SCHOOL LENGTH                            
+ 000A74 0690                         138          BCTR  R9,R0                DECREMENT REGISTER R9 BY 1                           
+ 000A76 1A89                         139          AR    R8,R9                00 00 10 01 SCHOOL + TEAM LENGTH                     
+ 000A78 F207 5034 0000 00034 00000   140          PACK  52(0,R5),0(R8)       PUT THE LENGTH INTO THE TABLE                        
+                                     141 *                                                                                        
+ 000A7E 4150 5036            00036   142          LA    R5,54(,R5)           INCREMENT TO NEXT ENTRY                              
+ 000A82 E004 0000 0050 00000         143          XREAD 0(R4),80             READ NEXT RECORD                                     
+ 000A88 47F0 C022            00A12   144          B     LOOP                 CONTINUE TO BRANCH                                   
+ 000A8C                              145 ENDLOOP  DS    0H                   END LOOP                                             
+ 000A8C 5050 3000            00000   146          ST    R5,0(,R3)            RETURN ANSWER TO CALLER                              
+                                     147 *                                                                                        
+ 000A90 58D0 D004            00004   148          L     R13,4(,R13)          EXIT LINKAGE                                         
+ 000A94 98EC D00C            0000C   149          LM    R14,R12,12(R13)                                                           
+1       CSCI 360 - Spring 2013 - Program 9                                                                      PAGE    5         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+ 000A98 07FE                         150          BR    R14                                                                       
+                                     151          LTORG                                                                           
+                                     152 *                                                                                        
+                                     153 * BUILD STORAGE AREA                                                                     
+                                     154 *                                                                                        
+ 000AA0                              155 BSAVE    DS    18F                                                                       
+ 000AE8 0000000000000000             156 COLON    DC    256X'00'                                                                  
+ 000B62                              157          ORG   COLON+C':'                                                                
+ 000B62 FF                           158          DC    X'FF'                                                                     
+ 000BE8                              159          ORG                                                                             
+ 000BE8 D200 5000 7000 00000 00000   160 MOVE     MVC   0(0,R5),0(R7)                                                             
+ 000BEE D200 5015 6000 00015 00000   161 MOVE2    MVC   21(0,R5),0(R6)                                                            
+ 000BF8                              162 TEMP1    DS    D                                                                         
+                                     163 ***********************************************************************                  
+                                     164 *                                                                                        
+                                     165 *  NAME:          PRINT                                                                  
+                                     166 *                                                                                        
+                                     167 *  FUNCTION:      THIS ROUTINES PRINT THE TABLE                                          
+                                     168 *                                                                                        
+                                     169 *  ENTRY COND:    0(1) - ADDRESS OF THE TABLE                                            
+                                     170 *                 4(1) - ADDRESS OF LOGICAL END OF THE TABLE                             
+                                     171 *                                                                                        
+                                     172 *                                                                                        
+                                     173 *  LOGIC:         1. READ FIRST RECORD                                                   
+                                     174 *                 2. WHILE THERE ARE MORE RECORDS                                        
+                                     175 *                 3.  GET INFO FROM THE TABLE                                            
+                                     176 *                 4.  PUT ONTO PRINT LINE                                                
+                                     177 *                 5.  WRITE PRINT LINE                                                   
+                                     178 *                 6.  INCREMENT TABLE POINTER                                            
+                                     179 *                 7.  READ NEXT RECORD                                                   
+                                     180 *                 8. END WHILE                                                           
+                                     181 *                                                                                        
+                                     182 *  REGISTERS:     R3    - ADDRESS OF THE TABLE                                           
+                                     183 *                 R4    - ADDRESS OF THE END OF THE TABLE                                
+                                     184 *                 R5    - TABLE POINTER                                                  
+                                     185 *                 R1    - ADDRESS OF THE PARAMETER LIST                                  
+                                     186 *                                                                                        
+                                     187 ***********************************************************************                  
+ 000C00                              188 PRINT    CSECT                                                                           
+ 000C00 90EC D00C            0000C   189          STM   R14,R12,12(R13)      SAVE THE CALLING ROUTINE'S REGISTER                  
+ 000C04 18CF                         190          LR    R12,R15              SETUP THE BASE REGISTER                              
+ 000C00                              191          USING PRINT,R12            FOR THE ROUTINE                                      
+ 000C06 41E0 C098            00C98   192          LA    R14,PSAVE            FIND THE ROUTINE'S SAVEAREA                          
+ 000C0A 50D0 E004            00004   193          ST    R13,4(,R14)          SAVE THE BACKWARD                                    
+ 000C0E 50E0 D008            00008   194          ST    R14,8(,R13)          AND FORWARD POINTERS                                 
+ 000C12 18DE                         195          LR    R13,R14                                                                   
+                                     196 *                                                                                        
+                                     197 * TABLE HEADERS                                                                          
+                                     198 *                                                                                        
+ 000C14 E020 C0E0 003B 00CE0         199          XPRNT PHEAD1,ENDPH1-PHEAD1                                                      
+ 000C1A E020 C11B 0051 00D1B         200          XPRNT PHEAD2,ENDPH2-PHEAD2                                                      
+ 000C20 E020 C16C 004D 00D6C         201          XPRNT DASH,ENDDASH-DASH                                                         
+                                     202 *                                                                                        
+ 000C26 9834 1000            00000   203          LM    R3,R4,0(R1)                 UNLOAD PARAMETERS                             
+                                     204 *                                                                                        
+ 000C2A 5930 4000            00000   205 LOOP2    C     R3,0(,R4)                   WHILE NOT END OF TABLE LOOP                   
+ 000C2E 47B0 C082            00C82   206          BNL   ENDLP2                      EXIT AT END OF TABLE                          
+1       CSCI 360 - Spring 2013 - Program 9                                                                      PAGE    6         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                     207 *                                                                                        
+                                     208 *        BCTR  R1,R0                                                                     
+                                     209 *        EX    MVC1                                                                      
+ 000C32 D213 C1BA 3000 00DBA 00000   210          MVC   PLINE+1(20),0(R3)                                                         
+ 000C38 D213 C1D4 3015 00DD4 00015   211          MVC   PLINE+27(20),21(R3)         MOVE TEAM TO PRINT LINE                       
+                                     212 *                                                                                        
+ 000C3E D205 C214 C090 00E14 00C90   213          MVC   GAME1(6),=X'402020202120'   MOVE GAME 1 TO LINE                           
+ 000C44 DE05 C214 302A 00E14 0002A   214          ED    GAME1(6),42(R3)                                                           
+ 000C4A D205 C1EA C214 00DEA 00E14   215          MVC   PLINE+49(6),GAME1                                                         
+                                     216 *                                                                                        
+ 000C50 D205 C21A C090 00E1A 00C90   217          MVC   GAME2(6),=X'402020202120'   MOVE GAME 2 TO LINE                           
+ 000C56 DE05 C21A 302D 00E1A 0002D   218          ED    GAME2(6),45(R3)                                                           
+ 000C5C D205 C1F4 C21A 00DF4 00E1A   219          MVC   PLINE+59(6),GAME2                                                         
+                                     220 *                                                                                        
+ 000C62 D205 C220 C090 00E20 00C90   221          MVC   GAME3(6),=X'402020202120'   MOVE GAME 3 TO LINE                           
+ 000C68 DE05 C220 3030 00E20 00030   222          ED    GAME3(6),48(R3)                                                           
+ 000C6E D205 C1FE C220 00DFE 00E20   223          MVC   PLINE+69(6),GAME3                                                         
+                                     224 *                                                                                        
+ 000C74 E020 C1B9 005B 00DB9         225          XPRNT PLINE,ENDPLINE-PLINE        PRINT TABLE                                   
+                                     226 *                                                                                        
+ 000C7A 4130 3036            00036   227          LA    R3,54(,R3)                  INCREMENT TABLE POINTER                       
+ 000C7E 47F0 C02A            00C2A   228          B     LOOP2                       CONTINUE LOOP                                 
+ 000C82                              229 ENDLP2   DS    0H                          END LOOP                                      
+                                     230 *                                                                                        
+ 000C82 58D0 D004            00004   231          L     R13,4(,R13)                 EXIT LINKAGE                                  
+ 000C86 98EC D00C            0000C   232          LM    R14,R12,12(R13)                                                           
+ 000C8A 07FE                         233          BR    R14                                                                       
+                                     234          LTORG                                                                           
+ 000C90 402020202120                 235                =X'402020202120'                                                          
+                                     236 *                                                                                        
+                                     237 * PRINT STORAGE AREA                                                                     
+                                     238 *                                                                                        
+ 000C98                              239 PSAVE    DS    18F                         PRINT SAVE AREA                               
+ 000CE0 F140404040404040             240 PHEAD1   DC    CL18'1'                     PAGE HEADER                                   
+ 000CF2 C2C9C740F940C3D6             241          DC    C'BIG 9 CONFERENCE TIDDILY-WINKS TOURNAMENT'                              
+ 000D1B                              242 ENDPH1   DS    0C                                                                        
+ 000D1B 60                           243 PHEAD2   DC    C'-'                        PAGE HEADER                                   
+ 000D1C E2C3C8D6D6D34040             244          DC    CL26'SCHOOL'                                                              
+ 000D36 E3C5C1D440404040             245          DC    CL24'TEAM'                                                                
+ 000D4E C7C1D4C540F14040             246          DC    CL10'GAME 1'                                                              
+ 000D58 C7C1D4C540F24040             247          DC    CL10'GAME 2'                                                              
+ 000D62 C7C1D4C540F34040             248          DC    CL10'GAME 3'                                                              
+ 000D6C                              249 ENDPH2   DS    0C                                                                        
+ 000D6C 40                           250 DASH     DC    C' '                        DASH LINE                                     
+ 000D6D 6060606060606060             251          DC    76C'-'                                                                    
+ 000DB9                              252 ENDDASH  DS    0C                                                                        
+ 000DB9 40                           253 PLINE    DC    C' '                        TABLE PRINT LINE                              
+ 000DBA 4040404040404040             254          DC    CL90' '                                                                   
+ 000E14                              255 ENDPLINE DS    0C                                                                        
+ 000E14                              256 GAME1    DS    PL6                                                                       
+ 000E1A                              257 GAME2    DS    PL6                                                                       
+ 000E20                              258 GAME3    DS    PL6                                                                       
+ 000E26 D200 C1BA 3000 00DBA 00000   259 MVC1     MVC   PLINE+1,0(R3)                                                             
+ 000E2C D200 C1D4 3015 00DD4 00015   260 MVC2     MVC   PLINE+27,21(R3)                                                           
+ 000E32                              261 SCHOOL1  DS    CL20                                                                      
+                                     262 *                                                                                        
+                                     263 * EQUATES                                                                                
+1       CSCI 360 - Spring 2013 - Program 9                                                                      PAGE    7         
+0  LOC  OBJECT CODE    ADDR1 ADDR2  STMT   SOURCE STATEMENT                                                                       
+                                     264 *                                                                                        
+ 000000                              265 R0      EQU   0                                                                          
+ 000001                              266 R1      EQU   1                                                                          
+ 000002                              267 R2      EQU   2                                                                          
+ 000003                              268 R3      EQU   3                                                                          
+ 000004                              269 R4      EQU   4                                                                          
+ 000005                              270 R5      EQU   5                                                                          
+ 000006                              271 R6      EQU   6                                                                          
+ 000007                              272 R7      EQU   7                                                                          
+ 000008                              273 R8      EQU   8                                                                          
+ 000009                              274 R9      EQU   9                                                                          
+ 00000A                              275 R10     EQU   10                                                                         
+ 00000B                              276 R11     EQU   11                                                                         
+ 00000C                              277 R12     EQU   12                                                                         
+ 00000D                              278 R13     EQU   13                                                                         
+ 00000E                              279 R14     EQU   14                                                                         
+ 00000F                              280 R15     EQU   15                                                                         
+                                     281         END   MAIN                                                                       
+0***  NO   STATEMENTS FLAGGED -  NO   WARNINGS,  NO   ERRORS                                                                      
+0*** DYNAMIC CORE AREA USED:  LOW:   13316 HIGH:    1340 LEAVING:  478912 FREE BYTES. AVERAGE:       51 BYTES/STMT ***            
+0*** ASSEMBLY TIME =    0.001 SECS,   282000 STATEMENTS/SEC ***                                                                   
+0*** PROGRAM EXECUTION BEGINNING - ANY OUTPUT BEFORE EXECUTION TIME MESSAGE IS PRODUCED BY USER PROGRAM ***                       
+1                 BIG 9 CONFERENCE TIDDILY-WINKS TOURNAMENT                                                                       
+-SCHOOL                    TEAM                    GAME 1    GAME 2    GAME 3                                                     
+ ----------------------------------------------------------------------------                                                     
+ Delaware St.ÿÿÿÿÿÿÿÿ      Blue Hensÿÿÿÿÿÿÿÿÿÿÿ     187       162       171                                                       
+ Delaware St.ÿÿÿÿÿÿÿÿ      Hedge Hogsÿÿÿÿÿÿÿÿÿÿ     199       123       175                                                       
+ Delaware St.ÿÿÿÿÿÿÿÿ      Canal Skiersÿÿÿÿÿÿÿÿ     151       126       165                                                       
+ Delaware St.ÿÿÿÿÿÿÿÿ      Newark Nutsÿÿÿÿÿÿÿÿÿ     183       188       191                                                       
+ Arkansas St.ÿÿÿÿÿÿÿÿ      Winkersÿÿÿÿÿÿÿÿÿÿÿÿÿ     136       121       149                                                       
+ Arkansas St.ÿÿÿÿÿÿÿÿ      Flippersÿÿÿÿÿÿÿÿÿÿÿÿ     177       181       187                                                       
+ Arkansas St.ÿÿÿÿÿÿÿÿ      Ark Ridersÿÿÿÿÿÿÿÿÿÿ     173       173       173                                                       
+ Arkansas St.ÿÿÿÿÿÿÿÿ      Sunevsÿÿÿÿÿÿÿÿÿÿÿÿÿÿ     196       189       190                                                       
+ Univ. New Mexicoÿÿÿÿ      Sun Bathersÿÿÿÿÿÿÿÿÿ     181       188       172                                                       
+ Univ. New Mexicoÿÿÿÿ      Ruin Diggersÿÿÿÿÿÿÿÿ     196       197       199                                                       
+ Univ. New Mexicoÿÿÿÿ      Plain Campersÿÿÿÿÿÿÿ     171       142       139                                                       
+ Univ. New Mexicoÿÿÿÿ      Eggheadsÿÿÿÿÿÿÿÿÿÿÿÿ     199       200       193                                                       
+ Univ. of Illinoisÿÿÿ      Campus Clownsÿÿÿÿÿÿÿ     196       191       193                                                       
+ Univ. of Illinoisÿÿÿ      Green St Watchersÿÿÿ     199       200       200                                                       
+ Univ. of Illinoisÿÿÿ      Illiniweksÿÿÿÿÿÿÿÿÿÿ     162       171       180                                                       
+ Univ. of Illinoisÿÿÿ      Samuraisÿÿÿÿÿÿÿÿÿÿÿÿ     117       162       156                                                       
+ Montana St.ÿÿÿÿÿÿÿÿÿ      Mountiesÿÿÿÿÿÿÿÿÿÿÿÿ     161       179       192                                                       
+ Montana St.ÿÿÿÿÿÿÿÿÿ      Jumpin Montsÿÿÿÿÿÿÿÿ     151       159       163                                                       
+ Montana St.ÿÿÿÿÿÿÿÿÿ      Bosersÿÿÿÿÿÿÿÿÿÿÿÿÿÿ     196       191       198                                                       
+ Montana St.ÿÿÿÿÿÿÿÿÿ      Spacersÿÿÿÿÿÿÿÿÿÿÿÿÿ     185       184       189                                                       
+ USCÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      Surfersÿÿÿÿÿÿÿÿÿÿÿÿÿ     173       169       168                                                       
+ USCÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      Coral Diversÿÿÿÿÿÿÿÿ     184       189       171                                                       
+ USCÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      Cometsÿÿÿÿÿÿÿÿÿÿÿÿÿÿ     183       181       199                                                       
+ USCÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      Trojansÿÿÿÿÿÿÿÿÿÿÿÿÿ     165       141       157                                                       
+ NIUÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      Huskiesÿÿÿÿÿÿÿÿÿÿÿÿÿ     192       194       196                                                       
+ NIUÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      Corn Eatersÿÿÿÿÿÿÿÿÿ     181       184       186                                                       
+ NIUÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      Barb Baitersÿÿÿÿÿÿÿÿ     191       163       164                                                       
+ NIUÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ      Controllersÿÿÿÿÿÿÿÿÿ     173       174       161                                                       
+ Univ. of Idahoÿÿÿÿÿÿ      Potato Skinsÿÿÿÿÿÿÿÿ     153       141       137                                                       
+ Univ. of Idahoÿÿÿÿÿÿ      Mountain Climbersÿÿÿ     191       196       194                                                       
+ Univ. of Idahoÿÿÿÿÿÿ      Ski Patrolÿÿÿÿÿÿÿÿÿÿ     199       200       199                                                       
+ Univ. of Idahoÿÿÿÿÿÿ      Temple Gazersÿÿÿÿÿÿÿ     162       125       143                                                       
+ NW Texas Stateÿÿÿÿÿÿ      Whinersÿÿÿÿÿÿÿÿÿÿÿÿÿ     106       104       1 4                                                       
+ NW Texas Stateÿÿÿÿÿÿ      Maple Headsÿÿÿÿÿÿÿÿÿ     117       115       120                                                       
+ NW Texas Stateÿÿÿÿÿÿ      Super Novasÿÿÿÿÿÿÿÿÿ     133       142       140                                                       
+ NW Texas Stateÿÿÿÿÿÿ      Micro Chipsÿÿÿÿÿÿÿÿÿ     108       106       118                                                       
+0*** EXECUTION TIME =    0.002 SECS.      1700 INSTRUCTIONS EXECUTED -   850000 INSTRUCTIONS/SEC ***                              
+0*** AM004 - NORMAL USER TERMINATION BY RETURN ***                                                                                

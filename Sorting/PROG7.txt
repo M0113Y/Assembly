@@ -1,0 +1,487 @@
+//KC03ECAA JOB ,'JONATHON MOLLEY',MSGCLASS=H
+//STEP1 EXEC PGM=ASSIST
+//STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR
+//SYSPRINT DD SYSOUT=*
+//SYSIN DD *
+    TITLE 'JONATHON MOLLEY, CSCI360, SECTION1, ASSIGN7'
+********************************************************
+* NAME:       MAIN
+*
+* FUNCTION:   SAVES THE VALUES OF THE FIRST RECORD AND
+*             CALLS THE BUILD AND PRINT ROUTINES
+*             TO MANIPULATE THE TABLE DATA
+*
+* INPUT:      NONE
+*
+* OUTPUT:     NONE
+*
+* REGISTERS:  R1  - THE ADDRESS OF THE PARAMETER LIST
+*             R2  - BEGINING ADDRESS OF THE TABLE
+*             R11 - BRANCH AND LINK TO ROUTINES
+*             R14 - RETURN ADDRESS
+*             R15 - BASE REGISTER
+*
+* PSEUDOCODE: 1. READ FIRST RECORD
+*             2. INTIALIZE TABLE
+*             3. CALL BUILD ROUTINE
+*             5. CALL PRINT ROUTINE
+*             6. EXIT PROGRAM
+*
+*********************************************************
+MAIN    CSECT
+        STM   R14,R12,12(R13)
+        LR    R12,R15
+        USING MAIN,R12
+        LA    R14,MSAVE
+        ST    R13,4(,R14)
+        ST    R14,8(,R13)
+        LR    R13,R14
+*
+* HEADERS
+*
+        XPRNT PHEAD,ENDHEAD-PHEAD
+        XPRNT PHEAD2,ENDPH2-PHEAD2
+        XPRNT DASH,ENDDASH-DASH
+*
+* BUILD TABLE
+*
+        LA    R2,TABLE        GET BEGINING ADDRESS
+        ST    R2,NEXTE        STORE IN NEXT AVAILBLE ENTRY
+*
+        LA    R1,BLIST
+        L     R15,=V(BUILD)
+        BALR  R14,R15
+*
+* ADD NEW PLAYERS TO THE TABLE
+*
+        LA    R1,BLIST
+        L     R15,=V(BUILD)
+        BALR  R14,R15
+*
+* PRINT TABLE
+*
+        LA    R1,PLIST
+        L     R15,=V(PRINT)
+        BALR  R14,R15
+*
+* UPDATE TABLE
+*
+        XPRNT PHEAD3,ENDPHD3-PHEAD3
+        XPRNT DASH2,ENDASH2-DASH2
+        LA    R1,UPLIST
+        L     R15,=V(UPDATE)
+        BALR  R14,R15
+*
+* SORT TABLE
+*
+        LA    R1,SSLIST
+        L     R15,=V(SORT)
+        BALR  R14,R15
+*
+* PRINT UPDATED SORTED TABLE
+*
+        XPRNT PHEAD,ENDHEAD-PHEAD
+        XPRNT PHEAD2,ENDPH2-PHEAD2
+        XPRNT DASH,ENDDASH-DASH
+        LA    R1,PLIST
+        L     R15,=V(PRINT)
+        BALR  R14,R15
+*
+        L     R13,4(,R13)               EXIT LINKAGE
+        LM    R14,R12,12(R13)
+        BR    R14
+        LTORG
+*
+* MAIN SAVE AREA
+*
+MSAVE   DS    18F
+TABLE   DS    390F             TABLE TO HOLD 40 ENTRIES
+NEXTE   DS    F                NEXT AVAILABLE ENTRY
+BUF     DS    CL80             INPUT BUFFER
+BLIST   DC    A(NEXTE,BUF)     BUILD PARAMETER LIST
+PLIST   DC    A(TABLE,NEXTE)
+UPLIST  DC    A(TABLE,NEXTE,BUF)
+SSLIST  DC    A(TABLE,NEXTE)
+PHEAD   DC    C'1'             PAGE HEADER
+        DC    40C' '
+        DC    CL32'Chicago Blackhawks Players Stats'
+ENDHEAD DS    0C
+PHEAD2  DC    C'-'
+        DC    CL1'#'
+        DC    CL3' '
+        DC    CL6'Player'
+        DC    CL16' '
+        DC    CL8'Position'
+        DC    CL4' '
+        DC    CL5'Games'
+        DC    CL4' '
+        DC    CL5'Goals'
+        DC    CL4' '
+        DC    CL7'Assists'
+        DC    CL4' '
+        DC    CL6'Points'
+        DC    CL5' '
+        DC    CL5'Shots'
+        DC    CL4' '
+        DC    CL10'Shooting %'
+        DC    CL4' '
+        DC    CL11'+/- Rating'
+ENDPH2  DS    0C
+DASH    DC    C'-'
+        DC    111C'-'
+ENDDASH DS    0C
+PHEAD3  DC    C'1'
+        DC    CL14'Update results'
+ENDPHD3 DS    0C
+DASH2   DC    C' '
+        DC    30C'-'
+ENDASH2 DS    0C
+***********************************************************
+* NAME:       BUILD
+*
+* FUNCTION:   THIS ROUTINE BUILDS THE TABLE
+*
+* INPUT:      INPUT BUFFER
+*
+* REGISTERS   R3  - NEXT ENTRY
+*             R4  - INPUT BUFFER
+*             R5  - TABLE POINTER
+*             R1  - ADDRESS OF PARAMETER LIST
+*             R12 - BASE REGISTER
+*             R13 - ADDRESS OF LOCAL SAVE AREA
+*             R14 - ADDRESS FOR RETURNING TO THE CALLER
+*             R15 - ADDRESS OF THE SUBROUTINE
+*
+* PSEUDOCODE: INTIALIZE
+*             READ FIRST RECORD
+*             WHILE THERE ARE ENTRIES
+*              MOVE PLAYER NAME AND POSITION TO TABLE
+*              PACK THE REST OF THE DATA
+*              INCREMENT TABLE
+*              READ NEXT RECORD
+*             ENDWHILE
+***********************************************************
+BUILD   CSECT
+        STM   R14,R12,12(R13)    STANDARD ENTRY LINKAGE
+        LR    R12,R15
+        USING BUILD,R12
+        LA    R14,BSAVE
+        ST    R13,4(,R14)
+        ST    R14,8(,R13)
+        LR    R13,R14
+*
+        LM    R3,R4,0(R1)        UNLOAD PARAMTERS
+        L     R5,0(,R3)          SET TABLE POINTER
+*
+        XREAD 0(R4),80           GET FIRST RECORD
+LOOP    BL    ENDLOOP
+        CLC   0(2,R4),=C'-1'
+        BE    ENDLOOP
+*
+        MVC   27(1,R5),3(R4)     MOVE PLAYER POS TO TABLE
+        MVC   2(25,R5),5(R4)     MOVE PLAYER TO TABLE
+*
+        PACK  0(2,R5),0(2,R4)    PUT PLAYER NUM INTO TABLE
+        PACK  28(2,R5),31(2,R4)  PUT NUM GAMES PLAYED INTO TABLE
+        PACK  30(2,R5),34(2,R4)  PUT NUM GOALS SCORED INTO TABLE
+        PACK  32(2,R5),37(2,R4)  PUT NUM OF ASSISTS INTO TABLE
+        PACK  34(3,R5),40(3,R4)  PUT NUM OF SHOTS TAKEN INTO TABLE
+        PACK  37(2,R5),44(2,R4)  +/- RATING
+*
+        LA    R5,39(,R5)         INCREMENT POINTER
+        XREAD 0(R4),80           READ NEXT RECORD
+        B     LOOP               REPEAT LOOP
+ENDLOOP DS    0H
+        ST    R5,0(,R3)          RETURN ANSWER TO CALLER
+*
+        L     R13,4(,R13)
+        LM    R14,R12,12(R13)
+        BR    R14                EXIT ROUTINE
+        LTORG
+BSAVE   DS    18F
+**********************************************************************
+*
+*  NAME:           PRINT
+*
+*  FUNCTION:       TO PRINT OUT THE TABLE AND PERFORM SHOOTING AND
+*                  NUMBER OF POINTS CALCULATIONS
+*
+*  OUTPUT:         THE WHOLE TABLE
+*
+*  REGISTERS:      R1  - PARAMETER LIST
+*                  R2  - ADDRESS OF THE TABLE
+*                  R3  - ADDRESS OF THE NEXT AVAILABLE ENTRY
+*                  R4  - TABLE POINTER
+*                  R12 - BASE REGISTER
+*                  R13 - ADDRESS OF LOCAL SAVE AREA
+*                  R14 - ADDRESS FOR RETURNING TO THE CALLER
+*                  R15 - ADDRESS OF THE SUBROUTINE
+*
+* PSEUDOCODE: STANDARD LINKAGE
+*             1. UNLOAD PARAMTERS
+*             2. SET UP TABLE POINTER
+*             3. WHILE NOT END OF FILE
+*                 PUT PLAYER NAME ON PRINT LINE
+*                 EDIT PLAYER NUM, NUM OF GAMES PLAYED, GOALS SCORED
+*                 ASSISTS, SHOTS TAKEN, AND +/- RATING
+*                 CALCULATE AND EDIT THE NUMBER OF POINTS SCORED
+*                 CALCULATE AND EDIT THE SHOOTING PERCENTAGE
+*                 INCREMENT TABLE POINTER
+*                ENDWHILE
+***********************************************************************
+PRINT   CSECT
+        STM   R14,R12,12(R13)      STANDARD LINKAGE
+        LR    R12,R15
+        USING PRINT,R12
+        LA    R14,PSAVE
+        ST    R13,4(,R14)
+        ST    R14,8(,R13)
+        LR    R13,R14
+*
+        LM    R2,R3,0(R1)
+        L     R4,0(,R3)            GET NEXT AVAILABLE ENTRY
+*
+LOOP2   CR    R2,R4                WHILE NOT END OF TABLE
+        BNL   ENDLOP2              EXIT AT END OF TABLE
+        MVC   PLAYNAM,2(R2)        GET PLAYER NAME
+        MVC   PLINE+5(25),PLAYNAM  PUT ON PRINT LINE
+*
+* POSITION CODE
+*
+        MVC   POSCODE,27(R2)       GET PLAYER POSITION CODE
+IF      CLI   POSCODE,C'R'         CHECK RIGHT WING POSITION CODE
+        BNE   ELSEIF               IF NOT THEN BRANCH TO ELSEIF
+        MVC   PLINE+27(10),RW      PUT RIGHT WING ON LINE
+ELSEIF  CLI   POSCODE,C'C'         CHECK CENTER POSITION CODE
+        BNE   ELSEIF2              IF NOT THEN BRANCH TO ELSEIF2
+        MVC   PLINE+27(10),CENTER   PUT CENTER ON LINE
+ELSEIF2 CLI   POSCODE,C'D'         CHECK DEFENSE POSITION CODE
+        BNE   ELSEIF3              IF NOT THEN BRANCH TO ELSEIF3
+        MVC   PLINE+27(10),DEF      PUT DEFENSE ON LINE
+ELSEIF3 CLI   POSCODE,C'G'         CHECK GOAL POSITION CODE
+        BNE   ELSEIF4              IF NOT THEN BRANCH TO ELSEIF4
+        MVC   PLINE+27(10),GOALIE   PUT GOALIE ON LINE
+ELSEIF4 CLI   POSCODE,C'L'         CHECK LEFT WING POSITION CODE
+        BNE   ENDIF                IF NOT THEN BRANCH TO ENDIF
+        MVC   PLINE+27(10),LW      PUT LEFT WING ON LINE
+ENDIF   DS    0H                   END IF
+*
+        MVC   PLAY#(4),=X'40202120'      EDIT PLAYER NUMBER
+        ED    PLAY#(4),0(R2)             FOR FORMAT
+        MVC   PLINE-1(4),PLAY#           PUT ON LINE
+*
+        MVC   NUMGAM(4),=X'40202120'    EDIT NUMBER GAMES
+        ED    NUMGAM(4),28(R2)          FOR FORMAT
+        MVC   PLINE+38(4),NUMGAM        PUT ON LINE
+*
+        MVC   GOALS(4),=X'40202120'     EDIT NUMBER OF GOALS
+        ED    GOALS(4),30(R2)           FOR FORMAT
+        MVC   PLINE+47(4),GOALS         PUT ON LINE
+*
+        MVC   ASSISTS(4),=X'40202120'    EDIT NUMBER OF ASSISTS
+        ED    ASSISTS(4),32(R2)          FOR FORMAT
+        MVC   PLINE+57(4),ASSISTS        PUT ON LINE
+*
+* CALCULATE NUMBER OF POINTS
+*
+        ZAP   POINTS,30(2,R2)           ADD GOALS TO POINTS
+        AP    POINTS,32(2,R2)           POINTS = GOALS + ASSISTS
+*
+        MVC   POUT(4),=X'40202120'
+        ED    POUT(4),POINTS
+        MVC   PLINE+68(4),POUT
+*
+        MVC   SHOTS(6),=X'402020202120'  EDIT NUMBER OF SHOTS
+        ED    SHOTS(6),34(R2)            FOR FORMAT
+        MVC   PLINE+76(6),SHOTS          PUT ON LINE
+*
+* CALCULATE SHOOTING PERCENTAGE
+*
+        ZAP   TEMP,30(2,R2)           PUT GOALS IN TEMP
+        SRP   TEMP,5,0                MULTIPLY BY 100
+IF2     CP    34(3,R2),=PL1'0'        IF ZERO DONT DIVIDE
+        BE    ZERO                    BRANCH OUT IF ZERO
+        DP    TEMP,34(3,R2)           GOALS/SHOTS
+        SRP   TEMP(3),(64-1),5        DIVIDE BY 100
+        ZAP   SHOTPER,TEMP(3)         SHOTPER NOW EQUALS TEMP
+*
+        MVC   SPEROUT(6),=X'402021204B20'
+        ED    SPEROUT(6),SHOTPER
+        MVC   PLINE+90(6),SPEROUT
+*
+        B     ENDIF2
+ZERO    DS    0H
+ENDIF2  DS    0H
+*
+IF3     CP    37(2,R2),=PL1'0'
+        BNH   ELSEIF5
+        LA    R1,RATING+3
+        MVC   RATING(4),=X'40202120'
+        EDMK  RATING(4),37(R2)
+        BCTR  R1,R0
+        MVI   0(R1),C'+'
+        MVC   PLINE+104(4),RATING
+        B     ENDIF3
+ELSEIF5 CP    37(2,R2),=PL1'0'
+        BE    ELSE
+        LA    R1,RATING+3
+        MVC   RATING(4),=X'40202120'
+        EDMK  RATING(4),37(R2)
+        BCTR  R1,R0
+        MVI   0(R1),C'-'
+        MVC   PLINE+104(4),RATING
+        B     ENDIF3
+ELSE    MVC   RATING(4),=X'40402120'
+        ED    RATING(4),37(R2)
+        MVC   PLINE+104(4),RATING
+ENDIF3  DS    0H
+*
+*
+        XPRNT PLINE,ENDLINE-PLINE        PRINT STAT LINE
+        LA    R2,39(,R2)
+        B     LOOP2
+ENDLOP2 DS    0H
+*
+        L     R13,4(,R13)
+        LM    R14,R12,12(R13)
+        BR    R14
+        LTORG
+PSAVE   DS    18F
+PLINE   DC    CL115' '
+ENDLINE DS    0C
+*
+RW      DC    CL10'Right Wing'
+CENTER  DC    CL10'Center    '
+DEF     DC    CL10'Defense   '
+GOALIE  DC    CL10'Goalie    '
+LW      DC    CL10'Left Wing'
+*
+POSCODE DS    CL1
+PLAYNAM DS    CL25
+PLAY#   DS    PL4
+NUMGAM  DS    PL4
+GOALS   DS    PL4
+ASSISTS DS    PL4
+SHOTS   DS    PL6
+POINTS  DS    PL2
+POUT    DS    PL4
+TEMP    DS    PL6
+SHOTPER DS    PL3                    SHOOTING PERCENTAGE
+SPEROUT DS    PL6
+RATING  DS    PL4
+**********************************************************************
+*
+* NAME:        UPDATE
+*
+* FUNCTION:    TO PERFORM A LINEAR SEARCH ON THE TABLE AND UPDATE
+*              ITS RECORDS
+*
+* INPUT:       INPUT BUFFER
+*
+* OUTPUT:      IF THE PLAYER WAS FOUND OR NOT FOUND
+*
+* REGISTERS:       R1  - PARAMETER LIST
+*                  R2  - ADDRESS OF THE TABLE
+*                  R3  - ADDRESS OF THE NEXT AVAILABLE ENTRY
+*                  R4  - ADDRESS OF INPUT BUFFER
+*                  R5  - TABLE POINTER
+*                  R12 - BASE REGISTER
+*                  R13 - ADDRESS OF LOCAL SAVE AREA
+*                  R14 - ADDRESS FOR RETURNING TO THE CALLER
+*                  R15 - ADDRESS OF THE SUBROUTINE
+*
+* PSEUDOCODE: INTIALIZE
+*             READ FIRST RECORD
+*             WHILE THERE ARE UPDATE RECORDS
+*              PERFORM LINEAR SEARCH
+*               IF PLAYER FOUND UPDATE DATA AND PRINT FOUND
+*               ELSE PRINT PLAYER NOT FOUND
+*               ENDIF
+*              READ NEXT RECORD
+*             ENDWHILE
+**********************************************************************
+UPDATE  CSECT
+        STM   R14,R12,12(R13)      STANDARD LINKAGE
+        LR    R12,R15
+        USING UPDATE,R12
+        LA    R14,UPSAVE
+        ST    R13,4(,R14)
+        ST    R14,8(,R13)
+        LR    R13,R14
+*
+        LM    R2,R4,0(R1)            UNLOAD PARAMETERS
+        LA    R5,0(,R2)
+*
+        XREAD 0(R4),80               READ FIRST RECORD
+LOOP3   BL    ENDLOP3
+        PACK  TEMP4(2),0(2,R4)
+        CP    TEMP4(2),0(2,R5)
+        BE    FOUND
+        XPRNT =CL21' PLAYER WAS NOT FOUND',21
+        B     HERE
+FOUND   XPRNT =CL17' PLAYER WAS FOUND',17
+*
+HERE    LA    R5,39(,R5)
+        XREAD 0(R4),80
+        B     LOOP3
+ENDLOP3 DS    0H
+        ST    R5,0(,R3)
+*
+        L     R13,4(,R13)            EXIT LINKAGE
+        LM    R14,R12,12(R13)
+        BR    R14
+        LTORG
+UPSAVE  DS    18F
+TEMP4   DS    PL2
+*
+* SORT ROUTINE
+*
+SORT    CSECT
+        STM   R14,R12,12(R13)      STANDARD LINKAGE
+        LR    R12,R15
+        USING SORT,R12
+        LA    R14,SSAVE
+        ST    R13,4(,R14)
+        ST    R14,8(,R13)
+        LR    R13,R14
+*
+        LM    R2,R3,0(R1)
+*        L     R4,0(,R3)              GET TABLE POINTER
+*
+*FOR     CR    R2,R4
+*        BNH   ENDFOR
+*        ZAP   POINTS,30(2,R2)           ADD GOALS TO POINTS
+*        AP    POINTS,32(2,R2)           POINTS = GOALS + ASSISTS
+*        L     R5,POINTS                 POINTS = TOP
+*        LA    R4,39(,R4)
+*FOR2    LR    R6,R5
+*
+*
+        L     R13,4(,R13)            EXIT LINKAGE
+        LM    R14,R12,12(R13)
+        BR    R14
+        LTORG
+SSAVE   DS    18F
+*
+* EQUATES
+*
+R0      EQU   0
+R1      EQU   1
+R2      EQU   2
+R3      EQU   3
+R4      EQU   4
+R5      EQU   5
+R6      EQU   6
+R7      EQU   7
+R8      EQU   8
+R9      EQU   9
+R10     EQU   10
+R11     EQU   11
+R12     EQU   12
+R13     EQU   13
+R14     EQU   14
+R15     EQU   15
+        END   MAIN
+/*
+//FT05F001 DD DSN=KC02330.CSCI360.FILES(DATA7),DISP=SHR
+//
